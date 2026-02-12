@@ -3,7 +3,7 @@
 # setup_project.sh - Automated Project Bootstrapping Script
 # Student Attendance Tracker - Project Factory
 
-# ---- Color Definitions ----
+# Color 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m' 
@@ -15,7 +15,7 @@ project_dir=""
 
 signal-trap() { 
     echo ""
-    echo e- "${RED}Scrip interupted!${NC}"
+    echo -e "${RED}Script interrupted!${NC}"
     echo "bundling the current state of the project directory into an archive .... "
     if [ -d "$project_dir" ]; then 
         archive_dir="${project_dir}_archive"
@@ -31,12 +31,12 @@ signal-trap() {
     exit 1   
     
 }
-rap cleanup_on_interrupt SIGINT
+trap signal-trap SIGINT
 
 # Get user input for directory name
-read -p "Enter a project identifier (e.g., c1, cohort2)" project_id
-if [ -z $project_id ]; then
-   echo -e "${READ}No input provided. Exiting ${NC}" 
+read -p "Enter a project identifier (e.g., c1, cohort2): " project_id
+if [ -z "$project_id" ]; then
+   echo -e "${RED}No input provided. Exiting ${NC}" 
    exit 1
 fi
 project_dir="attendance_tracker_${project_id}"
@@ -98,7 +98,7 @@ def run_attendance_check():
 if __name__ == "__main__":
     run_attendance_check()
 PYEOF
-echo "${GREEN}attendance_checker.py Created${NC}"  
+echo -e "${GREEN}attendance_checker.py Created${NC}"  
 
 cat > "$project_dir/Helpers/assets.csv" << 'CSVEOF'
 Email,Names,Attendance Count,Absence Count
@@ -107,7 +107,7 @@ bob@example.com,Bob Smith,7,8
 charlie@example.com,Charlie Davis,4,11
 diana@example.com,Diana Prince,15,0
 CSVEOF
-echo "${GREEN}assets.csv Created${NC}"    
+echo -e "${GREEN}assets.csv Created${NC}"    
 
 cat > "$project_dir/Helpers/config.json" << 'JSONEOF'
 {
@@ -126,17 +126,17 @@ cat > "$project_dir/reports/reports.log" << 'LOGEOF'
 [2026-02-06 18:10:01.469363] ALERT SENT TO bob@example.com: URGENT: Bob Smith, your attendance is 46.7%. You will fail this class.
 [2026-02-06 18:10:01.469424] ALERT SENT TO charlie@example.com: URGENT: Charlie Davis, your attendance is 26.7%. You will fail this class.
 LOGEOF
-echo "${GREEN}reports.log Created${NC}" 
+echo -e "${GREEN}reports.log Created${NC}" 
 
 #Dynamic Configuration(reports.config)
 
 echo ""
 echo "Dynamic Configuration"
 echo ""
-read -p "Do you want to update attendance thresholds? (y/n)" update_config
-if [ "$update_config" = "y"]; then   
+read -p "Do you want to update attendance thresholds? (y/n): " update_config
+if [ "$update_config" = "y" ]; then   
 echo ""
-echo "Current thresholds: Warning = 75%, Failure = 50%$"
+echo "Current thresholds: Warning = 75%, Failure = 50%"
 echo ""
 read -p "Enter new Warning threshold (default 75): " new_warning
 read -p "Enter new Failure threshold (default 50): " new_failure
@@ -151,13 +151,68 @@ new_failure=${new_failure:-50}
 fi
 
 # Use sed for in-place editing of config.json
-sed -i "s/\"warning\": [0-9]*/\"warning\": $new_warning/" "$PROJECT_DIR/Helpers/config.json"
-sed -i "s/\"failure\": [0-9]*/\"failure\": $new_failure/" "$PROJECT_DIR/Helpers/config.json"
+sed -i "s/\"warning\": [0-9]*/\"warning\": $new_warning/" "$project_dir/Helpers/config.json"
+sed -i "s/\"failure\": [0-9]*/\"failure\": $new_failure/" "$project_dir/Helpers/config.json"
 
 echo ""
-echo -e "${GREEN}  ✔ Updated config.json:${NC}"
+echo -e "${GREEN}    Updated config.json:${NC}"
 echo -e "${GREEN}    Warning threshold: ${new_warning}%${NC}"
 echo -e "${GREEN}    Failure threshold: ${new_failure}%${NC}"
 else
-    echo -e "${YELLOW}  Skipped. Using default thresholds (Warning: 75%, Failure: 50%).${NC}"
+    echo -e "Skipped. Using default thresholds (Warning: 75%, Failure: 50%)."
 fi
+
+#Environment Validation (Health Check)
+echo ""
+echo "Environment Validation (Health Check)"
+echo ""
+echo "Running health check ......"
+#ptyhon avialability check
+echo "Checking for Python3..."
+if python3 --version ; then
+  py_version=$(python3 --version 2>&1)
+  echo -e "${GREEN} python3 is intalled. ${py_version}${NC} "
+else  
+  echo -e "${RED}  WARNING: Python3 is NOT installed on this system.${NC}"
+  echo -e "${RED} PLEASE install to run The attendance_checker.py ${NC}"
+  fi
+#validity of files structure
+exists=true
+  
+if [ ! -f "$project_dir/attendance_checker.py" ]; then
+    echo -e "${RED}   Missing: attendance_checker.py${NC}"
+    exists=false
+fi
+
+if [ ! -d "$project_dir/Helpers" ]; then
+    echo -e "${RED}   Missing: Helpers/${NC}"
+    exists=false
+fi
+
+if [ ! -f "$project_dir/Helpers/assets.csv" ]; then
+    echo -e "${RED}   Missing: Helpers/assets.csv${NC}"
+    exists=false
+fi
+
+if [ ! -f "$project_dir/Helpers/config.json" ]; then
+    echo -e "${RED}   Missing: Helpers/config.json${NC}"
+    exists=false
+fi
+
+if [ ! -d "$project_dir/reports" ]; then
+    echo -e "${RED}   Missing: reports/${NC}"
+    exists=false
+fi
+
+if [ ! -f "$project_dir/reports/reports.log" ]; then
+    echo -e "${RED}   Missing: reports/reports.log${NC}"
+    exists=false
+fi
+
+if [ "$exists" = true ]; then
+    echo -e "${GREEN}   All files and directories are in place.${NC}"
+else
+    echo -e "${RED}   Some files or directories are missing!${NC}"
+fi
+
+
