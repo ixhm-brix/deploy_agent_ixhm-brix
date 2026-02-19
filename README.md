@@ -53,39 +53,7 @@ The script implements a **signal trap** for `SIGINT` (Ctrl+C). If you interrupt 
 
 1. The script catches the signal instead of terminating abruptly
 2. It bundles the current state of the project directory into a compressed archive named `attendance_tracker_<input>_archive.tar.gz`
-3. It deletes the incomplete project directory to keep your workspace clean
-
-### Example
-
-```bash
-$ ./setup_project.sh
-Enter a project identifier (e.g., c1, cohort2) demo
-
-===creating ridectory strature===
-attendance_checker.py Created
-assets.csv Created
-config.json created
-reports.log Created
-
-Dynamic Configuration
-
-Do you want to update attendance thresholds? (y/n) y
-
-Current thresholds: Warning = 75%, Failure = 50%
-
-Enter new Warning threshold (default 75): ^C
-Script interrupted!
-bundling the current state of the project directory into an archive ....
-Archive created: attendance_tracker_demo_archive.tar.gz
-Incomplete directory 'attendance_tracker_demo' has been removed.
-```
-
-### Extracting the Archive
-
-To recover the archived project:
-```bash
-tar -xzf attendance_tracker_demo_archive.tar.gz
-```
+3. It deletes the incomplete directory to keep your workspace clean
 
 ## Script Features
 
@@ -99,4 +67,9 @@ tar -xzf attendance_tracker_demo_archive.tar.gz
 
 - **`setup_project.sh`** — The master shell script that creates the project, configures it, and handles signals
 - **`README.md`** — This file, explains how to run the script and use the archive feature
+
+## Walkthrough Video
+
+[Walkthrough Video](https://drive.google.com/file/d/1tTqBq9257ORDsw19Gdw9QVyMqeDbY8vr/view?usp=drive_link)
+
 
